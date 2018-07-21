@@ -12,10 +12,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk,GObject
 GObject.threads_init() # Important!
 
-import os,urlparse,urllib
+import os,urllib
+from urllib.parse import urlparse
 import threading
 from datetime import datetime
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from os.path import expanduser
 from subprocess import Popen
 import subprocess
@@ -184,10 +185,10 @@ class PDFMakerWindow(Gtk.Window):
 
     def on_drag_data_received(self, widget, drag_context, x,y, data,info, time):
         if info == TARGET_ENTRY_TEXT:
-            text = urllib.unquote(data.get_text())
+            text = urllib.parse.unquote(data.get_text())
             entries = text.split('\r\n')
             for item in entries:
-                p = urlparse.urlparse(item)
+                p = urlparse(item)
                 if len(p.path)<3:
                     continue
                 finalPath = os.path.abspath(os.path.join(p.netloc, p.path))
@@ -203,7 +204,7 @@ class PDFMakerWindow(Gtk.Window):
         mtime = os.stat(path).st_mtime
         date = datetime.fromtimestamp(mtime)
         
-        rowData=[path,str(fsize/1024),date.strftime("%d.%m %H:%M")]
+        rowData=[path,str(int(fsize/1024)),date.strftime("%d.%m %H:%M")]
         self.fileStore.append(rowData)
     
 
@@ -280,8 +281,13 @@ class PDFMakerWindow(Gtk.Window):
         return thePath
     
     def _showError(self,text):
+        image = Gtk.Image()
+        image.set_from_stock(Gtk.STOCK_CAPS_LOCK_WARNING, Gtk.IconSize.DIALOG)
+        image.show()
+        
         dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
             Gtk.ButtonsType.OK, _t("DIALOG_TITLE_ERROR"))
+        dialog.set_image(image)
         dialog.format_secondary_text(text)
         dialog.run()
         dialog.destroy()   
@@ -335,7 +341,7 @@ class PDFBuilder():
         result = Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
         ##That aint working in thread!
         if len(result[1])>0:
-            return result[1]       
+            return result[1].decode("utf-8")       
         return ""
 
 class WorkerThread(threading.Thread):
