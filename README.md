@@ -10,7 +10,7 @@ This simple program is written in python 3 with the GTK3 Library. Drag'n drop fi
 
 ### Limitations
 Can only convert files that image-magick can. So mostly image files, no text files.
-Thunar File Browser does not seem to propagate drop events, so drag'n drop will not work. Works with PcManFm Browser
+Tested with Thunar & PcManFm Browser so far
 
 ### Thanks
 To Erich, whose idea this was
