@@ -185,7 +185,9 @@ class PDFMakerWindow(Gtk.Window):
 
     def on_drag_data_received(self, widget, drag_context, x,y, data,info, time):
         if info == TARGET_ENTRY_TEXT:
-            text = urllib.parse.unquote(data.get_text())
+            rawData =  data.get_data().decode("utf8")
+
+            text = urllib.parse.unquote(rawData)
             entries = text.split('\r\n')
             for item in entries:
                 p = urlparse(item)
@@ -225,6 +227,7 @@ class PDFMakerWindow(Gtk.Window):
         self.list.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
         self.list.drag_dest_set_target_list(None)
         self.list.drag_dest_add_text_targets()
+        self.list.drag_dest_add_uri_targets()
 
 
     def on_close_clicked(self, widget):
@@ -296,7 +299,7 @@ class PDFMakerWindow(Gtk.Window):
     def on_delete_clicked(self,widget):
         (model, item) = self.selection.get_selected()
         if item is not None:
-            self.fileStore.remove(item)
+            model.remove(item)
 
     def on_selected(self, selection):
         hasItems = len(self.fileStore) != 0
