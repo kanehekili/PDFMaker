@@ -23,6 +23,7 @@ import subprocess
 
 TARGET_ENTRY_TEXT =0
 DRAG_ACTION = Gdk.DragAction.COPY
+PDF_PATH ="/usr/bin/convert"
 
 lang = locale.getdefaultlocale()
 '''
@@ -40,6 +41,7 @@ Template
     TEXT_MAP["COL1"]="
     TEXT_MAP["COL2"]="
     TEXT_MAP["COL3"]="
+    TEXT_MAP["INSTALL_MAGICK"]="
 '''
 TEXT_MAP = {}
 if "en" in lang[0]:
@@ -56,6 +58,7 @@ if "en" in lang[0]:
     TEXT_MAP["COL1"]="File"
     TEXT_MAP["COL2"]="Size KB"
     TEXT_MAP["COL3"]="Date"
+    TEXT_MAP["INSTALL_MAGICK"]="Please install image-magick"
 elif "de" in lang[0]:
     TEXT_MAP["TITLE"]="Erichs PDF Konverter"
     TEXT_MAP["LABEL_DROP_AREA"]="Dateien auf die Liste ziehen"
@@ -70,6 +73,7 @@ elif "de" in lang[0]:
     TEXT_MAP["COL1"]="Datei"
     TEXT_MAP["COL2"]="Größe KB"
     TEXT_MAP["COL3"]="Datum"
+    TEXT_MAP["INSTALL_MAGICK"]="Bitte image-magick installieren"
 
 def _t(s):
     return TEXT_MAP[s]
@@ -83,35 +87,6 @@ class PDFMakerWindow(Gtk.Window):
         self._assureConfig()
         self._initWidgets()
         self.add_text_targets()
-        '''
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        self.add(vbox)
-
-        hbox = Gtk.Box(spacing=12)
-        vbox.pack_start(hbox, True, True, 0)
-
-        self.iconview = DragSourceIconView()
-        self.drop_area = DropArea()
-
-        hbox.pack_start(self.iconview, True, True, 0)
-        hbox.pack_start(self.drop_area, True, True, 0)
-
-        button_box = Gtk.Box(spacing=6)
-        vbox.pack_start(button_box, True, False, 0)
-
-        image_button = Gtk.RadioButton.new_with_label_from_widget(None,
-            "Images")
-        image_button.connect("toggled", self.add_image_targets)
-        button_box.pack_start(image_button, True, False, 0)
-
-        text_button = Gtk.RadioButton.new_with_label_from_widget(image_button,
-            "Text")
-        text_button.connect("toggled", self.add_text_targets)
-        button_box.pack_start(text_button, True, False, 0)
-
-        self.add_image_targets()
-        '''
-        
 
     def _initWidgets(self):
         '''
@@ -128,7 +103,8 @@ class PDFMakerWindow(Gtk.Window):
         self.list = self._makeList()
         
         #Top label
-        srclabel= Gtk.Label(_t("LABEL_DROP_AREA"))
+        srclabel= Gtk.Label()
+        srclabel.set_markup('<span foreground="red"><b>{0}</b></span>'.format(_t("LABEL_DROP_AREA")))
         labelbox.pack_start(srclabel,True,False,0)
         
         self.spinner = Gtk.Spinner()
@@ -153,11 +129,13 @@ class PDFMakerWindow(Gtk.Window):
         mainbox.pack_start(labelbox,False,True,0)
         mainbox.pack_start(self.list,True,True,3)
         mainbox.pack_end(lowerBtnBox,False,False,3)
-        
+  
         self.add(mainbox)
         self.set_border_width(5)
         self.set_default_size(self.config.getInt("SCREENX"), self.config.getInt("SCREENY"))
         self.connect("delete-event", self.on_winClose, None)
+        self.connect("show",self.on_Startup, None)
+        
 
     def _makeList(self):
         self.fileStore = Gtk.ListStore(str,str,str);
@@ -241,6 +219,7 @@ class PDFMakerWindow(Gtk.Window):
         self.buttonStart.set_sensitive(False)
         self.buttonDel.set_sensitive(False)
         self.buttonCanx.set_sensitive(False)
+        self.spinner.show()
         self.spinner.start()
         
         result = self._selectFile(self.config.get("DEST"))  
@@ -254,6 +233,7 @@ class PDFMakerWindow(Gtk.Window):
 
     def _pdfBuildDone(self,res):
         self.spinner.stop()
+        self.spinner.hide()
         self.buttonStart.set_sensitive(True)
         self.buttonCanx.set_sensitive(True)
         if len(res)>0:
@@ -316,6 +296,11 @@ class PDFMakerWindow(Gtk.Window):
             self.config.add("DEST",aPath);
         self.config.store()
 
+    def on_Startup(self,widget, data):
+        self.spinner.hide()
+        if not os.path.isfile(PDF_PATH):
+            self._showError(_t("INSTALL_MAGICK"))
+
 class PDFBuilder():
     def __init__(self,fileStore,target):
         self.fileStore=fileStore
@@ -334,7 +319,7 @@ class PDFBuilder():
         return ""    
         
     def makePDF(self,files):
-        cmd =["/usr/bin/convert"]
+        cmd =[PDF_PATH]
         for path in files:
             cmd.append(path)
         cmd.append("-quality")
