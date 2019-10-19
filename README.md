@@ -26,3 +26,6 @@ First commit
 
 28.07.2018
 Fixed some UI features + support for URI calls from File explorers
+
+19.10.2019
+Adapted to new GTK API - removed deprecation Warnings
