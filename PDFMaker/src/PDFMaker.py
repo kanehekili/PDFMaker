@@ -9,8 +9,8 @@ Linux only: Depends on image-magick
 import gi
 import locale
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk,GObject
-GObject.threads_init() # Important!
+from gi.repository import Gtk, Gdk,GLib
+#GObject.threads_init() # Important!
 
 import os,urllib
 from urllib.parse import urlparse
@@ -139,7 +139,7 @@ class PDFMakerWindow(Gtk.Window):
 
     def _makeList(self):
         self.fileStore = Gtk.ListStore(str,str,str);
-        theList = Gtk.TreeView(self.fileStore)
+        theList = Gtk.TreeView(model=self.fileStore)
        
         for n,name in enumerate([_t("COL1"),_t("COL2"),_t("COL3")]):
             if n is 0:
@@ -241,8 +241,9 @@ class PDFMakerWindow(Gtk.Window):
                 
     
     def _selectFile(self,defaultFolder):
-        dialog = Gtk.FileChooserDialog(_t("FILE_SAVE"), self,Gtk.FileChooserAction.SAVE,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        dialog = Gtk.FileChooserDialog(title=_t("FILE_SAVE"), parent=self,action=Gtk.FileChooserAction.SAVE)
+        #   buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,Gtk.STOCK_OPEN, Gtk.ResponseType.OK))                            
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
 
         dialog.set_filename(defaultFolder)
         pdfFilter = Gtk.FileFilter()
@@ -342,7 +343,7 @@ class WorkerThread(threading.Thread):
         res = self.processor.run()
 
         # The callback runs a GUI task, so wrap it!
-        GObject.idle_add(self.callback,res)
+        GLib.idle_add(self.callback,res)
 
 class ConfigAccessor():
     __SECTION="DATA"
