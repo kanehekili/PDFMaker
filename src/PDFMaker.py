@@ -3,9 +3,10 @@
 Created on 20 Jul 2018
 Icons courtesy of www.iconarchive.com.
 Icons licence: http://graphicloads.com/license/
-Linux only: Depends on image-magick
-@author: matze
+Linux only: Depends on image-magick and ghostscript
+@author: kanehekili
 '''
+VERSION="@xxxx@"
 import gi
 import locale
 gi.require_version('Gtk', '3.0')
@@ -142,13 +143,13 @@ class PDFMakerWindow(Gtk.Window):
         theList = Gtk.TreeView(model=self.fileStore)
        
         for n,name in enumerate([_t("COL1"),_t("COL2"),_t("COL3")]):
-            if n is 0:
+            if n == 0:
                 cell = Gtk.CellRendererText()
             else:
                 cell = Gtk.CellRendererText(xalign=1)
             column = Gtk.TreeViewColumn(name,cell,text=n);
             column.set_resizable(True)
-            if n is 0:
+            if n == 0:
                 column.set_expand(True)
             else:
                 column.set_alignment(0.5)
@@ -310,15 +311,21 @@ class PDFBuilder():
     def run(self):
         item = self.fileStore.get_iter_first ()
         files =[]
+        purePDF = True
         while ( item != None ):
             path = self.fileStore.get_value (item, 0)
+            if not path.endswith(".pdf"):
+                purePDF=False
             files.append(path)
             item = self.fileStore.iter_next(item)
+        if purePDF:
+            res=self.joinPDF(files)
+        else:
             res = self.makePDF(files)
-            if len(res)>0:
-                return res
+        if len(res)>0:
+            return res
         return ""    
-        
+
     def makePDF(self,files):
         cmd =[PDF_PATH]
         for path in files:
@@ -332,6 +339,22 @@ class PDFBuilder():
         if len(result[1])>0:
             return result[1].decode("utf-8")       
         return ""
+
+    '''
+    Perfect for pdfs:
+    gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOUTPUTFILE=out.pdf Test1.pdf Test2.pdf
+    '''
+    def joinPDF(self,files):
+        cmd =["/usr/bin/gs","-dBATCH","-dNOPAUSE", "-q","-sDEVICE=pdfwrite","-sOUTPUTFILE="+self.target]
+        for path in files:
+            cmd.append(path)
+        #no error ever showed up....
+        result = Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
+        ##That aint working in thread!
+        if len(result[1])>0:
+            return result[1].decode("utf-8")       
+        return ""
+
 
 class WorkerThread(threading.Thread):
     def __init__(self, callback,processor):

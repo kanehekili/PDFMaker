@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=python3 /usr/local/bin/PDFMaker/PDFMaker.py 
+Name=PDFMaker
+Comment=Join images and PDFs
+Icon=/usr/local/bin/PDFMaker/PDFMaker.png
+NoDisplay=false
+Categories=GTK;Office;
