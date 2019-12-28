@@ -1,6 +1,7 @@
 # PDFMaker
 ## Simple PDF converter GUI for Pictures using Image-Magick
-![Download](build/PDFMaker1.0.1.tar)
+Version 1.0.1
+![Download](https://github.com/kanehekili/PDFMaker/raw/master/build/PDFMaker1.0.1.tar)
 
 This simple program is written in python 3 with the GTK3 Library. Drag'n drop files (png, jpg, etc) onto the list and convert these files into one PDF with a simple click
 ![Screenshot](https://github.com/kanehekili/PDFMaker/blob/master/PDFMaker.png)
@@ -41,3 +42,6 @@ Fixed some UI features + support for URI calls from File explorers
 
 19.10.2019
 Adapted to new GTK API - removed deprecation Warnings
+
+29.12.2019
+Added PDF support, easy install scripts 
