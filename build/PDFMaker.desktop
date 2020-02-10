@@ -6,6 +6,6 @@ Type=Application
 Exec=python3 /usr/local/bin/PDFMaker/PDFMaker.py 
 Name=PDFMaker
 Comment=Join images and PDFs
-Icon=/usr/local/bin/PDFMaker/PDFMaker.png
+Icon=/usr/local/bin/PDFMaker/pdf-icon.png
 NoDisplay=false
 Categories=GTK;Office;
