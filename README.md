@@ -11,6 +11,12 @@ This simple program is written in python 3 with the GTK3 Library. Drag'n drop fi
 * image-magick
 * ghostscript (gs)
 
+### How to install
+* Download the PDFMaker*.tar contained in the "build" folder ![here](https://github.com/kanehekili/PDFMaker/raw/master/build/PDFMaker1.0.1.tar)
+* Unpack it and run the command  **sudo ./install.sh** in the unpacked folder.
+* Install just copies a desktop file and some python scripts to /usr/local/sbin/PDFMaker
+* You can now remove the unpacked files in your current download directory.
+
 ### Limitations
 Can only convert files that image-magick or ghostscript support. So either only image files, or only PDFs files. Not mixed.
 
