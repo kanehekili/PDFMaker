@@ -267,12 +267,11 @@ class PDFMakerWindow(Gtk.Window):
     
     def _showError(self,text):
         image = Gtk.Image()
-        image.set_from_stock(Gtk.STOCK_CAPS_LOCK_WARNING, Gtk.IconSize.DIALOG)
+        image.set_from_icon_name(Gtk.STOCK_CAPS_LOCK_WARNING, Gtk.IconSize.DIALOG)
         image.show()
         
-        dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-            Gtk.ButtonsType.OK, _t("DIALOG_TITLE_ERROR"))
-        dialog.set_image(image)
+        dialog = Gtk.MessageDialog(parent=self, flags=0, message_type=Gtk.MessageType.ERROR,
+            buttons=Gtk.ButtonsType.OK, test=_t("DIALOG_TITLE_ERROR"),image=image)
         dialog.format_secondary_text(text)
         dialog.run()
         dialog.destroy()   
